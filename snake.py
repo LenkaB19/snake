@@ -14,24 +14,62 @@ window = pyglet.window.Window(width=VELIKOST_OKNA, height=VELIKOST_OKNA)
 
 TILES_DIRECTORY = Path('snake-tiles')
 
-vysledek = dict()
-for image in TILES_DIRECTORY.glob('*.png'):
-    vysledek[image.stem] = pyglet.image.load(image)
+snake_tiles = dict()
 
-print(vysledek)
+for image in TILES_DIRECTORY.glob('*.png'):
+    snake_tiles[image.stem] = pyglet.image.load(image)
+
+print(snake_tiles)
 
 obrazek = pyglet.image.load('obrazek.png')
 jablko = pyglet.image.load('apple.png')
-had = pyglet.sprite.Sprite(obrazek)
+had = pyglet.sprite.Sprite(snake_tiles['top-left'])
 jidlo = pyglet.sprite.Sprite(jablko)
+
+def nazev_casti (souradnice, pozice):
+    # # hlava hada
+    if pozice == len(souradnice) - 1:
+        smer_x = souradnice[pozice][0] - souradnice[pozice-1][0]
+        smer_y = souradnice[pozice][1] - souradnice[pozice-1][1]
+        smer_tile = smer_pohybu (smer_x, smer_y)
+        return smer_tile + '-head'
+
+    if pozice == 0:
+        # ocas hada
+        smer_x = souradnice[pozice][0] - souradnice[pozice+1][0]
+        smer_y = souradnice[pozice][1] - souradnice[pozice+1][1]
+        smer_tile = smer_pohybu (smer_x, smer_y)
+        return  'tail-'  + smer_tile
+    # TODO telo hada
+    smer_x_previous = souradnice[pozice][0] - souradnice[pozice-1][0]
+    smer_y_previous = souradnice[pozice][1] - souradnice[pozice-1][1]
+    smer_x_next = souradnice[pozice][0] - souradnice[pozice+1][0]
+    smer_y_next = souradnice[pozice][1] - souradnice[pozice+1][1]
+    smer_tile_next = smer_pohybu (smer_x_next, smer_y_next)
+    smer_tile_previous = smer_pohybu(smer_x_previous, smer_y_previous)
+    return smer_tile_previous + '-' + smer_tile_next
+
+def smer_pohybu (smer_x, smer_y):
+    if smer_x == 1:
+        return 'left'
+    if smer_x == -1:
+        return 'right'
+    if smer_y == 1:
+        return 'bottom'
+    if smer_y == -1:
+        return 'top'   
 
 def vykresli():
     window.clear()
 
-    for x, y in souradnice:
-        had.x = x*STRANA_CTVERCE
-        had.y = y*STRANA_CTVERCE
-        had.draw()
+    for i in range(len(souradnice)):
+        x = souradnice[i][0]
+        y = souradnice[i][1]
+        nazev = nazev_casti(souradnice, i)
+        obrazek = pyglet.sprite.Sprite(snake_tiles[nazev])
+        obrazek.x = x*STRANA_CTVERCE
+        obrazek.y = y*STRANA_CTVERCE
+        obrazek.draw() 
 
     for x, y in seznam_jidel:
         jidlo.x = x*STRANA_CTVERCE
