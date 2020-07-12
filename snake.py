@@ -1,5 +1,6 @@
 import pyglet
 from pyglet.window import key
+from pathlib import Path
 
 STRANA_CTVERCE = 64
 ROZMER_POLE = 10
@@ -10,6 +11,14 @@ souradnice = [(0, 0), (1, 0), (2, 0)]
 seznam_jidel = [(2,3)]
 smer = [(0, 1)]
 window = pyglet.window.Window(width=VELIKOST_OKNA, height=VELIKOST_OKNA)
+
+TILES_DIRECTORY = Path('snake-tiles')
+
+vysledek = dict()
+for image in TILES_DIRECTORY.glob('*.png'):
+    vysledek[image.stem] = pyglet.image.load(image)
+
+print(vysledek)
 
 obrazek = pyglet.image.load('obrazek.png')
 jablko = pyglet.image.load('apple.png')
